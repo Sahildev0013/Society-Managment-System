@@ -99,33 +99,61 @@ if $mingw; then
 fi
 
 if [ -z "$JAVA_HOME" ]; then
-  javaExecutable="$(which javac)"
-  if [ -n "$javaExecutable" ] && ! [ "$(expr "$javaExecutable" : '\([^ ]*\)')" = "no" ]; then
-    # readlink(1) is not available as standard on Solaris 10.
-    readLink=$(which readlink)
-    if [ ! "$(expr "$readLink" : '\([^ ]*\)')" = "no" ]; then
-      if $darwin; then
-        javaHome="$(dirname "$javaExecutable")"
-        javaExecutable="$(cd "$javaHome" && pwd -P)/javac"
-      else
-        javaExecutable="$(readlink -f "$javaExecutable")"
-      fi
-      javaHome="$(dirname "$javaExecutable")"
-      javaHome=$(expr "$javaHome" : '\(.*\)/bin')
-      JAVA_HOME="$javaHome"
+  # 1. Check mise-installed JDK (used by Railway / Nixpacks)
+  if command -v mise >/dev/null 2>&1; then
+    mise_java="$(mise where java 2>/dev/null)"
+    if [ -n "$mise_java" ] && [ -x "$mise_java/bin/java" ]; then
+      JAVA_HOME="$mise_java"
       export JAVA_HOME
     fi
   fi
 fi
 
-if [ -z "$JAVACMD" ]; then
-  if [ -n "$JAVA_HOME" ]; then
-    if [ -x "$JAVA_HOME/jre/sh/java" ]; then
-      # IBM's JDK on AIX uses strange locations for the executables
-      JAVACMD="$JAVA_HOME/jre/sh/java"
-    else
-      JAVACMD="$JAVA_HOME/bin/java"
+if [ -z "$JAVA_HOME" ]; then
+  # 2. Try resolving via 'java' binary from PATH
+  if command -v java >/dev/null 2>&1; then
+    java_bin="$(command -v java)"
+    if command -v readlink >/dev/null 2>&1; then
+      java_bin="$(readlink -f "$java_bin" 2>/dev/null || echo "$java_bin")"
     fi
+    candidate_home="$(dirname "$java_bin")"
+    candidate_home="${candidate_home%/bin}"
+    if [ -x "$candidate_home/bin/java" ]; then
+      JAVA_HOME="$candidate_home"
+      export JAVA_HOME
+    fi
+  fi
+fi
+
+if [ -z "$JAVA_HOME" ]; then
+  # 3. Fallback to javac if present and points to a valid JDK with bin/java
+  javaExecutable="$(which javac 2>/dev/null)"
+  if [ -n "$javaExecutable" ] && ! [ "$(expr "$javaExecutable" : '\([^ ]*\)')" = "no" ]; then
+    readLink=$(which readlink 2>/dev/null)
+    if [ ! "$(expr "$readLink" : '\([^ ]*\)')" = "no" ]; then
+      if $darwin; then
+        javaHome="$(dirname "$javaExecutable")"
+        javaExecutable="$(cd "$javaHome" && pwd -P)/javac"
+      else
+        javaExecutable="$(readlink -f "$javaExecutable" 2>/dev/null || echo "$javaExecutable")"
+      fi
+      javaHome="$(dirname "$javaExecutable")"
+      javaHome=$(expr "$javaHome" : '\(.*\)/bin')
+      if [ -x "$javaHome/bin/java" ]; then
+        JAVA_HOME="$javaHome"
+        export JAVA_HOME
+      fi
+    fi
+  fi
+fi
+
+if [ -z "$JAVACMD" ]; then
+  if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+    JAVACMD="$JAVA_HOME/bin/java"
+  elif [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/jre/sh/java" ]; then
+    JAVACMD="$JAVA_HOME/jre/sh/java"
+  elif command -v java >/dev/null 2>&1; then
+    JAVACMD="$(command -v java)"
   else
     JAVACMD="$(
       \unset -f command 2>/dev/null
