@@ -41,7 +41,7 @@ while [ -h "$PRG" ]; do
   fi
 done
 
-BASE_DIR=`dirname "$PRG"`
+BASE_DIR=`cd "$(dirname "$PRG")" && pwd`
 WRAPPER_JAR="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
 
 if [ -z "$JAVA_HOME" ] ; then
@@ -67,4 +67,4 @@ if [ ! -f "$WRAPPER_JAR" ]; then
     curl -sS -L "$WRAPPER_URL" -o "$WRAPPER_JAR" || wget -q -O "$WRAPPER_JAR" "$WRAPPER_URL"
 fi
 
-exec "$JAVACMD" $MAVEN_OPTS -jar "$WRAPPER_JAR" "$@"
+exec "$JAVACMD" $MAVEN_OPTS -Dmaven.multiModuleProjectDirectory="$BASE_DIR" -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"
