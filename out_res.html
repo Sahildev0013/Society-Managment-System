@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Society Notice Board - Society Management System</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/custom.css" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 p-0 sidebar d-flex flex-column">
+        <a href="/" class="sidebar-brand text-decoration-none">
+            <i class="bi bi-buildings-fill text-primary fs-4"></i>
+            <div>
+                <span class="d-block text-white fw-bold">SocietyMS</span>
+                <span class="fs-8 text-light-50 fw-normal">Management Portal</span>
+            </div>
+        </a>
+
+        <!-- Admin Links -->
+        
+
+        <!-- Resident Links -->
+        <ul class="nav nav-pills flex-column mb-auto mt-2">
+            <li class="nav-item">
+                <a href="/resident/dashboard" class="nav-link">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/resident/bills" class="nav-link">
+                    <i class="bi bi-credit-card"></i> My Bills & Payments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/resident/complaints" class="nav-link">
+                    <i class="bi bi-chat-left-dots"></i> Raise Complaint
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/resident/visitors" class="nav-link">
+                    <i class="bi bi-shield-check"></i> Visitor Approvals
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/resident/notices" class="nav-link active">
+                    <i class="bi bi-megaphone"></i> Notice Board
+                </a>
+            </li>
+        </ul>
+
+        <!-- Guard Links -->
+        
+
+        <div class="p-3 text-secondary small border-top border-secondary-subtle">
+            <div class="fw-semibold text-white">Society Portal</div>
+            <div>Version 1.0.0 (Spring Boot 3)</div>
+        </div>
+    </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg top-navbar px-3 py-2 sticky-top">
+        <div class="container-fluid">
+            <span class="navbar-text fw-semibold text-secondary">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Green Valley Cooperative Housing Society
+            </span>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-weight: 600;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="text-end d-none d-sm-block">
+                        <div class="fw-bold fs-7 lh-sm text-dark">rahul@society.com</div>
+                        <span class="badge bg-secondary-subtle text-secondary border fs-8">[ROLE_RESIDENT]</span>
+                    </div>
+                </div>
+                <form action="/logout" method="post" class="m-0"><input type="hidden" name="_csrf" value="JXEX9CEqeJrwOE1EA0uLyUaKOqCZBthyXY1dcYv-F7M_bn_jFUh0lRIYQfzdD3twM2a_qn7uF8L6Mbpfa7loRrnKcooGD0eC"/>
+                    <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1">
+                        <i class="bi bi-box-arrow-right"></i> <span class="d-none d-md-inline">Logout</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Society Digital Notice Board</h3>
+                        <p class="text-muted small mb-0">Official circulars, AGM updates, maintenance announcements, and festival notifications.</p>
+                    </div>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div>
+        
+        
+    </div>
+
+                <!-- Notices List -->
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-top border-4 border-primary">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-primary-subtle text-primary border">Official Notice</span>
+                                    <small class="text-muted"><i class="bi bi-calendar-event me-1"></i><span>13 Oct 2026</span></small>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-3">Diwali Celebration &amp; Cultural Fest</h5>
+                                <p class="card-text text-secondary mb-4 flex-grow-1" style="white-space: pre-line;">Green Valley Cultural Committee invites all residents to celebrate Diwali together on Saturday evening. Games for kids, musical performances, and society dinner will begin at 6:30 PM at the central garden.</p>
+                                <div class="border-top pt-2 mt-auto d-flex justify-content-between align-items-center text-muted small">
+                                    <span><i class="bi bi-person-fill me-1"></i><span>Cultural Committee</span></span>
+                                    <span>02:43 pm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-top border-4 border-primary">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-primary-subtle text-primary border">Official Notice</span>
+                                    <small class="text-muted"><i class="bi bi-calendar-event me-1"></i><span>12 Oct 2026</span></small>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-3">Water Tank Cleaning Schedule</h5>
+                                <p class="card-text text-secondary mb-4 flex-grow-1" style="white-space: pre-line;">Please note that the overhead and underground water tanks will undergo deep chemical cleaning on Thursday between 10:00 AM and 3:00 PM. Water supply will remain paused during this interval. Kindly store adequate water.</p>
+                                <div class="border-top pt-2 mt-auto d-flex justify-content-between align-items-center text-muted small">
+                                    <span><i class="bi bi-person-fill me-1"></i><span>Estate Manager</span></span>
+                                    <span>06:43 pm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-top border-4 border-primary">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-primary-subtle text-primary border">Official Notice</span>
+                                    <small class="text-muted"><i class="bi bi-calendar-event me-1"></i><span>11 Oct 2026</span></small>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-3">Annual General Body Meeting (AGM)</h5>
+                                <p class="card-text text-secondary mb-4 flex-grow-1" style="white-space: pre-line;">The Annual General Body Meeting (AGM) of Green Valley Society will be held on Sunday at 10:00 AM in the Clubhouse. Major agenda points include solar installation and annual audit reports. All members are requested to attend.</p>
+                                <div class="border-top pt-2 mt-auto d-flex justify-content-between align-items-center text-muted small">
+                                    <span><i class="bi bi-person-fill me-1"></i><span>Society Secretary</span></span>
+                                    <span>06:43 pm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/app.js"></script>
+    </div>
+</body>
+</html>

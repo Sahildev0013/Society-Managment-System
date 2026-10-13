@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Gate Security & Visitor Log')}"></head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/layout :: sidebar('dashboard')}"></div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <div th:replace="~{fragments/layout :: navbar}"></div>
+
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Gate Pass & Security Log</h3>
+                        <p class="text-muted small mb-0">Record incoming visitors, deliveries, contractors and log vehicle/pedestrian exits.</p>
+                    </div>
+                    <span class="badge bg-dark fs-7 px-3 py-2">
+                        <i class="bi bi-clock me-1"></i> Shift: Active Gate Desk
+                    </span>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div th:replace="~{fragments/layout :: alerts}"></div>
+
+                <div class="row g-4">
+                    <!-- Left: Log Visitor Entry Form -->
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm border-primary">
+                            <div class="card-header bg-primary text-white fw-semibold">
+                                <i class="bi bi-person-plus-fill me-1"></i> Log New Visitor Entry
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/guard/visitors/entry}" th:object="${visitorDto}" method="post">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Destination Flat <span class="text-danger">*</span></label>
+                                        <select th:field="*{flatId}" class="form-select" required>
+                                            <option value="">-- Select Flat --</option>
+                                            <option th:each="flat : ${flats}" th:value="${flat.id}" th:text="${flat.fullFlatName}">A-101</option>
+                                        </select>
+                                        <small class="text-danger" th:if="${#fields.hasErrors('flatId')}" th:errors="*{flatId}"></small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Visitor Full Name <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{name}" class="form-control" placeholder="e.g. Ramesh Kumar" required />
+                                        <small class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Phone Number (10 Digits) <span class="text-danger">*</span></label>
+                                        <input type="tel" th:field="*{phone}" class="form-control" placeholder="9876543210" pattern="[0-9]{10}" required />
+                                        <small class="text-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></small>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-semibold">Purpose of Visit <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{purpose}" class="form-control" placeholder="e.g. Courier delivery, Guest, AC Repair" required />
+                                        <small class="text-danger" th:if="${#fields.hasErrors('purpose')}" th:errors="*{purpose}"></small>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                                        <i class="bi bi-door-open-fill me-1"></i> Record Entry (Notify Flat)
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Today's Visitors Table -->
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="bi bi-clock-history me-2"></i>Today's Visitors (<span th:text="${#lists.size(todayVisitors)}">0</span>)</span>
+                                <small class="text-muted">Live Gate Activity</small>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Visitor Details</th>
+                                                <th>Flat</th>
+                                                <th>Purpose</th>
+                                                <th>In Time</th>
+                                                <th>Resident Status</th>
+                                                <th class="text-end">Exit Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="v : ${todayVisitors}">
+                                                <td>
+                                                    <div class="fw-semibold text-dark" th:text="${v.name}">Visitor Name</div>
+                                                    <small class="text-muted"><i class="bi bi-telephone me-1"></i><span th:text="${v.phone}">9876543210</span></small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary fs-7" th:text="${v.flat.shortName}">A-101</span>
+                                                </td>
+                                                <td>
+                                                    <span class="small text-secondary" th:text="${v.purpose}">Delivery</span>
+                                                </td>
+                                                <td>
+                                                    <span class="small text-dark" th:text="${#temporals.format(v.inTime, 'hh:mm a')}">10:30 AM</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-status"
+                                                          th:classappend="${v.status == 'APPROVED' ? 'bg-success' : (v.status == 'PENDING' ? 'bg-warning text-dark' : (v.status == 'COMPLETED' ? 'bg-secondary' : 'bg-danger'))}"
+                                                          th:text="${v.status}">PENDING</span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <!-- If on premises (outTime == null), show Mark Exit button -->
+                                                    <form th:if="${v.outTime == null}" th:action="@{'/guard/visitors/' + ${v.id} + '/exit'}" method="post" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold">
+                                                            <i class="bi bi-box-arrow-right me-1"></i> Mark Exit
+                                                        </button>
+                                                    </form>
+                                                    <!-- If exit already logged -->
+                                                    <div th:if="${v.outTime != null}" class="small text-muted">
+                                                        <i class="bi bi-check-all text-success me-1"></i>Exited: <span th:text="${#temporals.format(v.outTime, 'hh:mm a')}">11:00 AM</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(todayVisitors)}">
+                                                <td colspan="6" class="text-center text-muted py-4">No visitors logged today yet. Use the form on the left to record new arrivals.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

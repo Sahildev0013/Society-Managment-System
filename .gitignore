@@ -1,0 +1,6 @@
+target/
+data/
+cookies*
+*.mv.db
+*.trace.db
+.env

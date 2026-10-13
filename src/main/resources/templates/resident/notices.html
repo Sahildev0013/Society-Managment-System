@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Society Notice Board')}"></head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/layout :: sidebar('notices')}"></div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <div th:replace="~{fragments/layout :: navbar}"></div>
+
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Society Digital Notice Board</h3>
+                        <p class="text-muted small mb-0">Official circulars, AGM updates, maintenance announcements, and festival notifications.</p>
+                    </div>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div th:replace="~{fragments/layout :: alerts}"></div>
+
+                <!-- Notices List -->
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-4" th:each="n : ${notices}">
+                        <div class="card h-100 shadow-sm border-top border-4 border-primary">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-primary-subtle text-primary border">Official Notice</span>
+                                    <small class="text-muted"><i class="bi bi-calendar-event me-1"></i><span th:text="${#temporals.format(n.createdOn, 'dd MMM yyyy')}">Date</span></small>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-3" th:text="${n.title}">Notice Title</h5>
+                                <p class="card-text text-secondary mb-4 flex-grow-1" style="white-space: pre-line;" th:text="${n.message}">Notice message description...</p>
+                                <div class="border-top pt-2 mt-auto d-flex justify-content-between align-items-center text-muted small">
+                                    <span><i class="bi bi-person-fill me-1"></i><span th:text="${n.postedBy}">Admin</span></span>
+                                    <span th:text="${#temporals.format(n.createdOn, 'hh:mm a')}">10:00 AM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12" th:if="${#lists.isEmpty(notices)}">
+                        <div class="card p-5 text-center text-muted">
+                            <i class="bi bi-megaphone fs-1 d-block mb-2 text-secondary"></i>
+                            <h5>No active notices posted</h5>
+                            <p class="small mb-0">Check back later for updates from the managing committee.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Visitor Log Archive')}"></head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/layout :: sidebar('visitors')}"></div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <div th:replace="~{fragments/layout :: navbar}"></div>
+
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Security Gate Visitor Archive</h3>
+                        <p class="text-muted small mb-0">Complete historical security log of society visitors, delivery agents, and service personnel.</p>
+                    </div>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div th:replace="~{fragments/layout :: alerts}"></div>
+
+                <!-- Visitors Table -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold"><i class="bi bi-shield-lock-fill text-primary me-2"></i>All Gate Entries (<span th:text="${#lists.size(visitors)}">0</span>)</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Visitor Details</th>
+                                        <th>Target Flat</th>
+                                        <th>Purpose</th>
+                                        <th>Entry Time</th>
+                                        <th>Exit Time</th>
+                                        <th>Approval Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="v : ${visitors}">
+                                        <td>
+                                            <div class="fw-semibold text-dark" th:text="${v.name}">Visitor Name</div>
+                                            <small class="text-muted"><i class="bi bi-telephone me-1"></i><span th:text="${v.phone}">9876543210</span></small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary fs-7" th:text="${v.flat.shortName}">A-101</span>
+                                            <small class="text-muted d-block" th:text="${v.flat.type}">2 BHK</small>
+                                        </td>
+                                        <td>
+                                            <span class="text-secondary small fw-medium" th:text="${v.purpose}">Delivery</span>
+                                        </td>
+                                        <td>
+                                            <span class="small text-dark" th:text="${#temporals.format(v.inTime, 'dd MMM yyyy, hh:mm a')}">13 Oct 2026, 10:30 AM</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${v.outTime != null}" class="small text-secondary" th:text="${#temporals.format(v.outTime, 'dd MMM yyyy, hh:mm a')}">13 Oct 2026, 11:15 AM</span>
+                                            <span th:if="${v.outTime == null}" class="badge bg-light text-warning-emphasis border">Still Inside</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-status"
+                                                  th:classappend="${v.status == 'APPROVED' ? 'bg-success' : (v.status == 'PENDING' ? 'bg-warning text-dark' : (v.status == 'COMPLETED' ? 'bg-secondary' : 'bg-danger'))}"
+                                                  th:text="${v.status}">APPROVED</span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(visitors)}">
+                                        <td colspan="6" class="text-center text-muted py-4">No visitor records logged yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

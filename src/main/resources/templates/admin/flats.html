@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Flat Management')}"></head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/layout :: sidebar('flats')}"></div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <div th:replace="~{fragments/layout :: navbar}"></div>
+
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Flat Inventory Management</h3>
+                        <p class="text-muted small mb-0">Add, view, and manage society residential flats and configurations.</p>
+                    </div>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div th:replace="~{fragments/layout :: alerts}"></div>
+
+                <div class="row g-4">
+                    <!-- Left: Flat Form (Add / Edit) -->
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white fw-semibold">
+                                <i class="bi bi-door-open-fill me-1"></i>
+                                <span th:text="${isEdit == true ? 'Edit Flat Information' : 'Register New Flat'}">Register Flat</span>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/admin/flats/save}" th:object="${flatDto}" method="post">
+                                    <input type="hidden" th:field="*{id}" />
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Wing / Block <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{wing}" class="form-control text-uppercase" placeholder="e.g. A, B, C" required />
+                                        <small class="text-danger" th:if="${#fields.hasErrors('wing')}" th:errors="*{wing}"></small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Flat Number <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{flatNumber}" class="form-control" placeholder="e.g. 101, 202, 303" required />
+                                        <small class="text-danger" th:if="${#fields.hasErrors('flatNumber')}" th:errors="*{flatNumber}"></small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Floor <span class="text-danger">*</span></label>
+                                        <input type="number" th:field="*{floor}" min="0" class="form-control" placeholder="e.g. 1, 2, 3" required />
+                                        <small class="text-danger" th:if="${#fields.hasErrors('floor')}" th:errors="*{floor}"></small>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-semibold">Flat Type <span class="text-danger">*</span></label>
+                                        <select th:field="*{type}" class="form-select" required>
+                                            <option value="">-- Select Type --</option>
+                                            <option value="1 BHK">1 BHK</option>
+                                            <option value="2 BHK">2 BHK</option>
+                                            <option value="3 BHK">3 BHK</option>
+                                            <option value="4 BHK">4 BHK</option>
+                                            <option value="Penthouse">Penthouse</option>
+                                        </select>
+                                        <small class="text-danger" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></small>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary flex-grow-1">
+                                            <i class="bi bi-check-lg me-1"></i>
+                                            <span th:text="${isEdit == true ? 'Update Flat' : 'Save Flat'}">Save Flat</span>
+                                        </button>
+                                        <a th:if="${isEdit == true}" th:href="@{/admin/flats}" class="btn btn-outline-secondary">Cancel</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Flats List Table -->
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="bi bi-list-columns-reverse me-2"></i>All Flats (<span th:text="${#lists.size(flats)}">0</span>)</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Flat Identification</th>
+                                                <th>Floor</th>
+                                                <th>Type</th>
+                                                <th>Residents</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="flat : ${flats}">
+                                                <td>
+                                                    <span class="badge bg-primary fs-7 me-1" th:text="${flat.wing}">A</span>
+                                                    <strong class="fs-6 text-dark" th:text="${flat.flatNumber}">101</strong>
+                                                </td>
+                                                <td th:text="${flat.floor == 0 ? 'Ground' : flat.floor + 'th Floor'}">1st</td>
+                                                <td>
+                                                    <span class="badge bg-secondary-subtle text-secondary border" th:text="${flat.type}">2 BHK</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" th:classappend="${#lists.isEmpty(flat.residents) ? 'bg-secondary' : 'bg-success'}"
+                                                          th:text="${#lists.size(flat.residents) + ' Resident(s)'}">0</span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <a th:href="@{'/admin/flats/edit/' + ${flat.id}}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                                        <i class="bi bi-pencil-fill"></i>
+                                                    </a>
+                                                    <form th:action="@{'/admin/flats/delete/' + ${flat.id}}" method="post" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger btn-delete-confirm" title="Delete">
+                                                            <i class="bi bi-trash-fill"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(flats)}">
+                                                <td colspan="5" class="text-center text-muted py-4">No flats created yet. Use the form on the left to add flats.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Visitor Approvals')}"></head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/layout :: sidebar('visitors')}"></div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <div th:replace="~{fragments/layout :: navbar}"></div>
+
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Gate Pass & Visitor Approvals</h3>
+                        <p class="text-muted small mb-0">Approve or reject incoming guests, delivery riders, and technicians for Flat <strong th:text="${resident.flat.shortName}">A-101</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div th:replace="~{fragments/layout :: alerts}"></div>
+
+                <!-- Visitors Table -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold"><i class="bi bi-shield-check text-primary me-2"></i>Visitors Log for My Flat (<span th:text="${#lists.size(visitors)}">0</span>)</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Visitor Details</th>
+                                        <th>Purpose of Visit</th>
+                                        <th>Entry Time</th>
+                                        <th>Exit Time</th>
+                                        <th>Approval Status</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="v : ${visitors}">
+                                        <td>
+                                            <div class="fw-semibold text-dark" th:text="${v.name}">Visitor Name</div>
+                                            <small class="text-muted"><i class="bi bi-telephone me-1"></i><span th:text="${v.phone}">9876543210</span></small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border" th:text="${v.purpose}">Delivery</span>
+                                        </td>
+                                        <td>
+                                            <span class="small text-dark" th:text="${#temporals.format(v.inTime, 'dd MMM yyyy, hh:mm a')}">13 Oct, 10:30 AM</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${v.outTime != null}" class="small text-secondary" th:text="${#temporals.format(v.outTime, 'dd MMM yyyy, hh:mm a')}">13 Oct, 11:30 AM</span>
+                                            <span th:if="${v.outTime == null}" class="badge bg-light text-warning-emphasis border">On Premises</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-status"
+                                                  th:classappend="${v.status == 'APPROVED' ? 'bg-success' : (v.status == 'PENDING' ? 'bg-warning text-dark' : (v.status == 'COMPLETED' ? 'bg-secondary' : 'bg-danger'))}"
+                                                  th:text="${v.status}">PENDING</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <!-- Actions if PENDING -->
+                                            <div th:if="${v.status == 'PENDING'}" class="d-inline-flex gap-1">
+                                                <form th:action="@{'/resident/visitors/' + ${v.id} + '/approve'}" method="post" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-success fw-semibold">
+                                                        <i class="bi bi-check-lg me-1"></i> Approve
+                                                    </button>
+                                                </form>
+                                                <form th:action="@{'/resident/visitors/' + ${v.id} + '/reject'}" method="post" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold">
+                                                        <i class="bi bi-x-lg me-1"></i> Reject
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <!-- Otherwise show completed or handled badge -->
+                                            <span th:if="${v.status != 'PENDING'}" class="text-muted small">
+                                                <i class="bi bi-check2-all me-1"></i>Handled
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(visitors)}">
+                                        <td colspan="6" class="text-center text-muted py-4">No visitor records logged for your flat.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

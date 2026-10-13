@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Complaints Management')}"></head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/layout :: sidebar('complaints')}"></div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <div th:replace="~{fragments/layout :: navbar}"></div>
+
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Resident Complaints & Grievances</h3>
+                        <p class="text-muted small mb-0">Track reported issues, update resolution status, and provide feedback to residents.</p>
+                    </div>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div th:replace="~{fragments/layout :: alerts}"></div>
+
+                <!-- Complaints Table -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold"><i class="bi bi-exclamation-octagon-fill text-danger me-2"></i>All Grievances (<span th:text="${#lists.size(complaints)}">0</span>)</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date & Resident</th>
+                                        <th>Flat</th>
+                                        <th>Category</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th style="min-width: 250px;">Update Status & Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="c : ${complaints}">
+                                        <td>
+                                            <div class="fw-semibold text-dark" th:text="${c.resident.user.name}">Resident Name</div>
+                                            <small class="text-muted" th:text="${#temporals.format(c.createdOn, 'dd MMM yyyy, hh:mm a')}">Date</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary fs-7" th:text="${c.resident.flat.shortName}">A-101</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border" th:text="${c.category}">Plumbing</span>
+                                        </td>
+                                        <td>
+                                            <p class="mb-1 text-secondary small" th:text="${c.description}">Description text</p>
+                                            <div th:if="${c.adminRemark != null && c.adminRemark != ''}" class="p-2 bg-light rounded small border-start border-3 border-info">
+                                                <strong>Admin Remark:</strong> <span th:text="${c.adminRemark}">Remarks</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-status"
+                                                  th:classappend="${c.status == 'OPEN' ? 'bg-danger' : (c.status == 'IN_PROGRESS' ? 'bg-warning text-dark' : 'bg-success')}"
+                                                  th:text="${c.status}">OPEN</span>
+                                        </td>
+                                        <td>
+                                            <form th:action="@{'/admin/complaints/' + ${c.id} + '/status'}" method="post" class="d-flex flex-column gap-2">
+                                                <div class="input-group input-group-sm">
+                                                    <select name="status" class="form-select form-select-sm">
+                                                        <option value="OPEN" th:selected="${c.status == 'OPEN'}">OPEN</option>
+                                                        <option value="IN_PROGRESS" th:selected="${c.status == 'IN_PROGRESS'}">IN PROGRESS</option>
+                                                        <option value="RESOLVED" th:selected="${c.status == 'RESOLVED'}">RESOLVED</option>
+                                                    </select>
+                                                    <button type="submit" class="btn btn-outline-primary btn-sm">Update</button>
+                                                </div>
+                                                <input type="text" name="remark" class="form-control form-control-sm" placeholder="Add remark/technician update..." th:value="${c.adminRemark}">
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(complaints)}">
+                                        <td colspan="6" class="text-center text-muted py-4">No complaints logged yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Raise & Track Complaints')}"></head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/layout :: sidebar('complaints')}"></div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <div th:replace="~{fragments/layout :: navbar}"></div>
+
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Society Grievance & Helpdesk</h3>
+                        <p class="text-muted small mb-0">Register maintenance issues, track real-time resolution status, and view staff feedback.</p>
+                    </div>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div th:replace="~{fragments/layout :: alerts}"></div>
+
+                <div class="row g-4">
+                    <!-- Left: Raise Complaint Form -->
+                    <div class="col-lg-5">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-danger text-white fw-semibold">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Log New Complaint Ticket
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/resident/complaints/save}" th:object="${complaintDto}" method="post">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Complaint Category <span class="text-danger">*</span></label>
+                                        <select th:field="*{category}" class="form-select" required>
+                                            <option value="">-- Choose Category --</option>
+                                            <option value="Plumbing">Plumbing (Water leakage, taps, pipes)</option>
+                                            <option value="Electrical">Electrical (Power failure, switches, wiring)</option>
+                                            <option value="Carpentry">Carpentry (Doors, windows, locks)</option>
+                                            <option value="Security">Security & Parking (Trespassing, parking slots)</option>
+                                            <option value="Noise & Nuisance">Noise & Disturbance</option>
+                                            <option value="Cleaning & Hygiene">Cleaning & Common Area Garbage</option>
+                                            <option value="Lift & Amenities">Lift / Gym / Clubhouse Maintenance</option>
+                                            <option value="Other">Other Miscellaneous</option>
+                                        </select>
+                                        <small class="text-danger" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></small>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-semibold">Detailed Description <span class="text-danger">*</span></label>
+                                        <textarea th:field="*{description}" rows="5" class="form-control" placeholder="Describe the issue clearly, mentioning specific rooms or locations if applicable..." required></textarea>
+                                        <small class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold">
+                                        <i class="bi bi-send-fill me-1"></i> Submit Complaint Ticket
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Complaints History Table -->
+                    <div class="col-lg-7">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="bi bi-ticket-detailed-fill me-2"></i>My Tickets (<span th:text="${#lists.size(complaints)}">0</span>)</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Category & Date</th>
+                                                <th>Description</th>
+                                                <th>Status</th>
+                                                <th>Management Remarks</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="c : ${complaints}">
+                                                <td>
+                                                    <span class="badge bg-light text-dark border mb-1" th:text="${c.category}">Plumbing</span>
+                                                    <small class="text-muted d-block" th:text="${#temporals.format(c.createdOn, 'dd MMM yyyy')}">Date</small>
+                                                </td>
+                                                <td>
+                                                    <p class="text-secondary small mb-0" th:text="${c.description}">Description text</p>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-status"
+                                                          th:classappend="${c.status == 'OPEN' ? 'bg-danger' : (c.status == 'IN_PROGRESS' ? 'bg-warning text-dark' : 'bg-success')}"
+                                                          th:text="${c.status}">OPEN</span>
+                                                </td>
+                                                <td>
+                                                    <div th:if="${c.adminRemark != null && c.adminRemark != ''}" class="small text-info-emphasis fw-medium">
+                                                        <i class="bi bi-chat-quote-fill me-1"></i><span th:text="${c.adminRemark}">Remark</span>
+                                                    </div>
+                                                    <div th:if="${c.adminRemark == null || c.adminRemark == ''}" class="text-muted small fst-italic">
+                                                        Awaiting staff review
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(complaints)}">
+                                                <td colspan="4" class="text-center text-muted py-4">No complaints submitted yet.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

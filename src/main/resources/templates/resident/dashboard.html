@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Resident Dashboard')}"></head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/layout :: sidebar('dashboard')}"></div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <div th:replace="~{fragments/layout :: navbar}"></div>
+
+            <div class="p-4">
+                <!-- Welcome Banner -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">
+                            Hello, <span th:text="${resident.user.name}">Resident</span>!
+                        </h3>
+                        <p class="text-muted small mb-0">
+                            Flat <strong th:text="${resident.flat.shortName}">A-101</strong> (<span th:text="${resident.residentType}">OWNER</span>) &bull; Green Valley CHS
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/resident/complaints}" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-exclamation-circle me-1"></i> Report Issue
+                        </a>
+                        <a th:href="@{/resident/bills}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-credit-card me-1"></i> Pay Maintenance
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div th:replace="~{fragments/layout :: alerts}"></div>
+
+                <!-- Gate Approval Alert Banner if any pending visitors -->
+                <div th:if="${!#lists.isEmpty(visitorRequests)}" class="alert alert-warning border-warning d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-exclamation fs-3 text-warning-emphasis"></i>
+                        <div>
+                            <strong class="text-warning-emphasis">Visitor Approval Requested!</strong>
+                            <div class="small">You have <span th:text="${#lists.size(visitorRequests)}">1</span> visitor waiting at the gate for your approval.</div>
+                        </div>
+                    </div>
+                    <a th:href="@{/resident/visitors}" class="btn btn-warning btn-sm fw-semibold">Review Requests</a>
+                </div>
+
+                <!-- Overview Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-xl-4">
+                        <div class="card stat-card p-3 border-start border-4 border-warning">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small fw-semibold text-uppercase">Pending Maintenance</div>
+                                    <div class="fs-3 fw-bold text-warning-emphasis">
+                                        ₹<span th:text="${#numbers.formatDecimal(pendingAmount, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                    </div>
+                                    <small class="text-muted"><span th:text="${pendingBillsCount}">0</span> pending invoice(s)</small>
+                                </div>
+                                <div class="bg-warning-subtle text-warning-emphasis p-3 rounded-3">
+                                    <i class="bi bi-receipt fs-3"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-4">
+                        <div class="card stat-card p-3 border-start border-4 border-info">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small fw-semibold text-uppercase">Your Complaints</div>
+                                    <div class="fs-3 fw-bold text-dark" th:text="${#lists.size(ownComplaints)}">0</div>
+                                    <small class="text-muted">Tickets logged</small>
+                                </div>
+                                <div class="bg-info-subtle text-info p-3 rounded-3">
+                                    <i class="bi bi-chat-left-dots fs-3"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-4">
+                        <div class="card stat-card p-3 border-start border-4 border-success">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small fw-semibold text-uppercase">Allocated Flat</div>
+                                    <div class="fs-3 fw-bold text-dark" th:text="${resident.flat.shortName}">A-101</div>
+                                    <small class="text-muted" th:text="${resident.flat.type + ' &bull; Floor ' + resident.flat.floor}">2 BHK</small>
+                                </div>
+                                <div class="bg-success-subtle text-success p-3 rounded-3">
+                                    <i class="bi bi-building fs-3"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Row -->
+                <div class="row g-4">
+                    <!-- Pending Bills Preview & Pay -->
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="bi bi-credit-card-2-front text-primary me-2"></i>Pending Maintenance Invoices</span>
+                                <a th:href="@{/resident/bills}" class="btn btn-sm btn-link text-decoration-none">Payment History</a>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Month</th>
+                                                <th>Amount</th>
+                                                <th>Due Date</th>
+                                                <th class="text-end">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="bill : ${ownPendingBills}">
+                                                <td><strong th:text="${bill.billingMonth}">2026-10</strong></td>
+                                                <td>₹<span th:text="${#numbers.formatDecimal(bill.amount, 1, 'COMMA', 2, 'POINT')}">2,500.00</span></td>
+                                                <td><span class="small text-danger fw-semibold" th:text="${#temporals.format(bill.dueDate, 'dd MMM yyyy')}">25 Oct</span></td>
+                                                <td class="text-end">
+                                                    <a th:href="@{/resident/bills}" class="btn btn-sm btn-success">
+                                                        <i class="bi bi-wallet2 me-1"></i> Pay Now
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(ownPendingBills)}">
+                                                <td colspan="4" class="text-center text-success py-4">
+                                                    <i class="bi bi-check-circle-fill fs-4 d-block mb-1"></i>
+                                                    No pending bills! All maintenance payments are up to date.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latest Notices -->
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="bi bi-megaphone-fill text-info me-2"></i>Recent Notices</span>
+                                <a th:href="@{/resident/notices}" class="btn btn-sm btn-link text-decoration-none">Notice Board</a>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item p-3" th:each="n : ${latestNotices}">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <h6 class="fw-bold text-dark mb-0" th:text="${n.title}">Notice Title</h6>
+                                            <small class="text-muted" th:text="${#temporals.format(n.createdOn, 'dd MMM')}">12 Oct</small>
+                                        </div>
+                                        <p class="text-secondary small mb-1 text-truncate" th:text="${n.message}">Message</p>
+                                        <small class="text-muted fst-italic">By: <span th:text="${n.postedBy}">Secretary</span></small>
+                                    </li>
+                                    <li class="list-group-item p-3 text-center text-muted" th:if="${#lists.isEmpty(latestNotices)}">
+                                        No recent notices.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Recent Complaints -->
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="bi bi-chat-square-text text-danger me-2"></i>My Reported Grievances</span>
+                                <a th:href="@{/resident/complaints}" class="btn btn-sm btn-outline-danger">Raise New Complaint</a>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Category</th>
+                                                <th>Details</th>
+                                                <th>Reported On</th>
+                                                <th>Status</th>
+                                                <th>Management Remarks</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="c : ${ownComplaints}">
+                                                <td><span class="badge bg-light text-dark border" th:text="${c.category}">Plumbing</span></td>
+                                                <td class="text-secondary" th:text="${c.description}">Low water pressure...</td>
+                                                <td class="small" th:text="${#temporals.format(c.createdOn, 'dd MMM yyyy')}">10 Oct 2026</td>
+                                                <td>
+                                                    <span class="badge badge-status"
+                                                          th:classappend="${c.status == 'OPEN' ? 'bg-danger' : (c.status == 'IN_PROGRESS' ? 'bg-warning text-dark' : 'bg-success')}"
+                                                          th:text="${c.status}">OPEN</span>
+                                                </td>
+                                                <td>
+                                                    <span th:if="${c.adminRemark != null}" class="small text-info-emphasis fw-medium" th:text="${c.adminRemark}">Remarks</span>
+                                                    <span th:if="${c.adminRemark == null}" class="text-muted small fst-italic">Pending review</span>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(ownComplaints)}">
+                                                <td colspan="5" class="text-center text-muted py-3">No complaints registered by you.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Log Archive - Society Management System</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/custom.css" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 p-0 sidebar d-flex flex-column">
+        <a href="/" class="sidebar-brand text-decoration-none">
+            <i class="bi bi-buildings-fill text-primary fs-4"></i>
+            <div>
+                <span class="d-block text-white fw-bold">SocietyMS</span>
+                <span class="fs-8 text-light-50 fw-normal">Management Portal</span>
+            </div>
+        </a>
+
+        <!-- Admin Links -->
+        <ul class="nav nav-pills flex-column mb-auto mt-2">
+            <li class="nav-item">
+                <a href="/admin/dashboard" class="nav-link">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/flats" class="nav-link">
+                    <i class="bi bi-door-closed"></i> Flats
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/residents" class="nav-link">
+                    <i class="bi bi-people"></i> Residents
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/bills" class="nav-link">
+                    <i class="bi bi-receipt"></i> Maintenance Bills
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/notices" class="nav-link">
+                    <i class="bi bi-megaphone"></i> Notice Board
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/complaints" class="nav-link">
+                    <i class="bi bi-exclamation-octagon"></i> Complaints
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/visitors" class="nav-link active">
+                    <i class="bi bi-person-badge"></i> Visitor Log
+                </a>
+            </li>
+        </ul>
+
+        <!-- Resident Links -->
+        
+
+        <!-- Guard Links -->
+        
+
+        <div class="p-3 text-secondary small border-top border-secondary-subtle">
+            <div class="fw-semibold text-white">Society Portal</div>
+            <div>Version 1.0.0 (Spring Boot 3)</div>
+        </div>
+    </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-0">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg top-navbar px-3 py-2 sticky-top">
+        <div class="container-fluid">
+            <span class="navbar-text fw-semibold text-secondary">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Green Valley Cooperative Housing Society
+            </span>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-weight: 600;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="text-end d-none d-sm-block">
+                        <div class="fw-bold fs-7 lh-sm text-dark">admin@society.com</div>
+                        <span class="badge bg-secondary-subtle text-secondary border fs-8">[ROLE_ADMIN]</span>
+                    </div>
+                </div>
+                <form action="/logout" method="post" class="m-0"><input type="hidden" name="_csrf" value="iBHz4iampSzmYOqrzKodX16Et23zo468eTR765tUqTg69iBGuHeV0kWVkxjLUdnO-YcpZzq1mgzBxuyRSwAejq9mmwgOxEYg"/>
+                    <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1">
+                        <i class="bi bi-box-arrow-right"></i> <span class="d-none d-md-inline">Logout</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Security Gate Visitor Archive</h3>
+                        <p class="text-muted small mb-0">Complete historical security log of society visitors, delivery agents, and service personnel.</p>
+                    </div>
+                </div>
+
+                <!-- Flash Alerts -->
+                <div>
+        
+        
+    </div>
+
+                <!-- Visitors Table -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold"><i class="bi bi-shield-lock-fill text-primary me-2"></i>All Gate Entries (<span>3</span>)</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Visitor Details</th>
+                                        <th>Target Flat</th>
+                                        <th>Purpose</th>
+                                        <th>Entry Time</th>
+                                        <th>Exit Time</th>
+                                        <th>Approval Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold text-dark">Kavita Verma</div>
+                                            <small class="text-muted"><i class="bi bi-telephone me-1"></i><span>9822334455</span></small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary fs-7">A-102</span>
+                                            <small class="text-muted d-block">3 BHK</small>
+                                        </td>
+                                        <td>
+                                            <span class="text-secondary small fw-medium">Family Guest / Relative</span>
+                                        </td>
+                                        <td>
+                                            <span class="small text-dark">13 Oct 2026, 05:43 pm</span>
+                                        </td>
+                                        <td>
+                                            <span class="small text-secondary">13 Oct 2026, 06:49 pm</span>
+                                            
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-status bg-secondary">COMPLETED</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold text-dark">Suresh Roy</div>
+                                            <small class="text-muted"><i class="bi bi-telephone me-1"></i><span>9811223344</span></small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary fs-7">A-101</span>
+                                            <small class="text-muted d-block">2 BHK</small>
+                                        </td>
+                                        <td>
+                                            <span class="text-secondary small fw-medium">Amazon Package Delivery</span>
+                                        </td>
+                                        <td>
+                                            <span class="small text-dark">13 Oct 2026, 03:43 pm</span>
+                                        </td>
+                                        <td>
+                                            
+                                            <span class="badge bg-light text-warning-emphasis border">Still Inside</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-status bg-success">APPROVED</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold text-dark">Manoj Electrician</div>
+                                            <small class="text-muted"><i class="bi bi-telephone me-1"></i><span>9833445566</span></small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary fs-7">B-201</span>
+                                            <small class="text-muted d-block">2 BHK</small>
+                                        </td>
+                                        <td>
+                                            <span class="text-secondary small fw-medium">AC Servicing Work</span>
+                                        </td>
+                                        <td>
+                                            <span class="small text-dark">12 Oct 2026, 11:15 am</span>
+                                        </td>
+                                        <td>
+                                            <span class="small text-secondary">12 Oct 2026, 01:45 pm</span>
+                                            
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-status bg-secondary">COMPLETED</span>
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/app.js"></script>
+    </div>
+</body>
+</html>
